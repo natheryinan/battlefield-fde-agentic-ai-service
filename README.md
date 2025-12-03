@@ -40,164 +40,172 @@ If you attempt to steal or replicate this code, you are fully consenting to lega
 
 You have been warned.
 
-# 🚀 **Battlefield FDE – Agentic AI + FastAPI Production Microservice**
 
-🔥 *End-to-End Agentic Architecture · Real FastAPI Service · Creator Profile Ready*
+<p align="center"> <img src="assets/LORDYINAN.jpg" width="360" style="border-radius: 18px; box-shadow: 0 0 12px rgba(255,0,128,0.45);" /> </p> <p align="center"><b>“The Creator Behind the Battlefield FDE Architecture.”</b></p> <h1 align="center">🔥 battlefield-fde-agentic-ai-service 🔥</h1> <h3 align="center">Adversarial Defense · Agentic AI · Gradient Equilibrium Framework</h3> <p align="center"> <b>Robustness · Equilibrium · Agentic Intelligence · FDE Battlefield Simulation</b> </p>
+🌐 Introduction
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/FastAPI--Production-green?style=for-the-badge"/>
-  <img src="https://img.shields.io/badge/Agentic_AI-Black?style=for-the-badge"/>
-</p>
+battlefield-fde-agentic-ai-service 是一个高度工程化的 对抗鲁棒学习系统（Adversarial Robustness System），核心涵盖：
 
+U-Net 生成器 (Generator) —— 去噪 / 重建 / 多尺度结构恢复
 
----
+PatchGAN 判别器 (Discriminator) —— 噪声真实性对抗
 
-# 👑 **Creator**
+FDE Classifier —— 战场级 logits 结构稳定化
 
-<p align="center">
-  <img src="assets/LORDYINAN.jpg" width="260" style="border-radius: 12px;">
-</p>
+PGD / FGSM / RL-Enhanced Adversarial Attack —— 模拟高等级攻击
 
----
+Loss Surface Explorer —— 可视化模型地形、检查损失盆地几何形态
 
-# 🧬 **1. System Architecture (Full Overview)**
+Skip-Connection Gradient Stabilization —— 用跳连强化梯度平滑性
 
-```
-                     ┌────────────────────────────┐
-                     │        Client / UI         │
-                     │   (Browser / Postman)      │
-                     └─────────────┬──────────────┘
-                                   │  HTTP
-                      ┌────────────▼──────────────┐
-                      │        FastAPI API         │
-                      │  src/deployment/api/main.py│
-                      └─────────────┬──────────────┘
-                /health   /plan   /run_mission   /agents
-                                   │
-                 ┌─────────────────┼──────────────────┐
-                 │                 │                  │
-     ┌───────────▼──────┐  ┌──────▼────────┐  ┌──────▼────────┐
-     │ Retrieval Agent   │  │ Planning Agent│  │ Execution Agent│
-     │ (search_tool.py)  │  │ planner.py    │  │ executor.py    │
-     └───────────┬──────┘  └──────┬────────┘  └────────┬───────┘
-                 │                 │                    │
-                 └───────────┬────┴───────────────┬────┘
-                             │ Multi-Agent Memory  │
-                             │ (Redis / Local)     │
-                             └─────────┬───────────┘
-                               ┌───────▼─────────┐
-                               │   LLM Backend    │
-                               │  (OpenAI / HF)   │
-                               └──────────────────┘
-```
+这是一个专为 真实世界“高攻击密度环境” 设计的系统，用于观察模型在噪音、扰动、对抗、梯度偏移下的行为与鲁棒性。
 
----
-
-# 🧠 **2. Agent Pipeline**
-
-```
-User Request → FastAPI Endpoint
-          → Retrieval Agent (tools, search)
-          → Planning Agent (LLM Planner)
-          → Execution Agent (tool-calling / actions)
-          → Response Assembly → API Output
-```
-
----
-
-# ⚙️ **3. Tech Stack**
-
-| Layer         | Technology                              |
-| ------------- | --------------------------------------- |
-| Language      | Python 3.11                             |
-| API Framework | FastAPI + Uvicorn                       |
-| Agents        | Custom Retrieval / Planning / Execution |
-| Tools         | Search Tool / Echo Tool / Shell Tool    |
-| Monitoring    | Logging + Rich Traces                   |
-| Future Ready  | Docker · AWS Lambda · CI/CD             |
-
----
-
-# 🧩 **4. Project Structure**
-
-```
-FDE-PROJECTS/
-│ README.md
-│ requirements.txt
+📁 Repository Structure
+<details> <summary><b>点击展开 · 完整结构</b></summary>
+battlefield-fde-agentic-ai-service/
 │
 ├── assets/
-│    └── yinan.jpg
+│   └── LORDYINAN.jpg
 │
-├── architecture/
-│    └── system_architecture.png   (optional PNG)
+├── docs/
+│   ├── index.html
+│   └── architecture/
+│       └── system_overview.md
+│
+├── infra/
+│   └── terraform/
+│       └── main.tf
+│
+├── notebooks/
+│   └── experiments.ipynb
 │
 ├── src/
-│   ├── deployment/
-│   │     └── api/
-│   │           └── main.py
-│   │
 │   ├── agents/
-│   │     ├── retrieval_agent.py
-│   │     ├── planner_agent.py
-│   │     ├── execution_agent.py
-│   │     └── tools/
-│   │          ├── search_tool.py
-│   │          ├── echo_tool.py
-│   │          └── shell_tool.py
-│   │
+│   ├── deployment/
 │   ├── llm/
+│   ├── models/
+│   │   ├── generator_unet.py
+│   │   ├── discriminator.py
+│   │   ├── fde_classifier.py
+│   │   └── __init__.py
+│   │
 │   ├── ops/
-│   └── utils/
+│   ├── utils/
+│   │   ├── loss_surface_adapter.py
+│   │   ├── logger.py
+│   │   └── config.py
+│   │
+│   ├── train_fde_with_surface.py
+│   └── train_gan_fde.py
 │
-└── tests/
-```
+├── tests/
+│
+├── LICENSE.md
+├── LEGAL_NOTICE.md
+├── DMCA-NOTICE.md
+└── README.md
 
----
+</details>
+🧠 Model Overview
+<details> <summary><b>点击展开 · 模型结构（G / D / C）</b></summary>
+🟦 Generator (U-Net + Skip Connections)
 
-# 🧪 **5. Endpoints**
+4× 下采样卷积 (Downsampling)
 
-| Method | Route          | Description           |
-| ------ | -------------- | --------------------- |
-| GET    | `/health`      | Service heartbeat     |
-| POST   | `/plan`        | LLM Planner agent     |
-| POST   | `/run_mission` | Full agentic pipeline |
+13× 残差块 (Residual Blocks)
 
----
+4× 上采样反卷积 (Upsampling)
 
-# 🖥️ **6. Run Locally**
+全局残差结构
+output = noisy + G(noisy)
 
-```
-uvicorn src.deployment.api.main:app --reload
-```
+🟥 Discriminator (PatchGAN)
 
----
+多层卷积 Patch-Level 判别
 
-# 🎯 **7. High-Impact Summary (Recruiter Ready)**
+输出形状与输入图像 patch 数量对应
 
-> **I built and ran a production-style FastAPI + Agentic AI microservice locally, featuring a multi-agent pipeline (Retrieval → Planning → Execution), real tools, and a clean API surface.**
+BCEWithLogitsLoss
 
----
+🟩 Classifier (FDE Classifier)
 
-# 🏆 **8. Why This Project Matters**
+Robust Convolution + Residual Structure
 
-* Demonstrates experience with **Agentic AI workflows**
-* Shows ability to **design real API services**
-* Proves **LLM + tools orchestration**
-* Matches hiring bar for **AI Engineer / Data Scientist / MLE** roles
-* Recruiters & CTOs can understand the architecture in < 15 seconds
+强化 logits margin
 
----
+Loss Surface Visualization Support
 
-# 📌 **9. Next Steps (Optional Enhancements)**
+Cross-Entropy for Clean & Denoised
 
-You can later add：
+</details>
+⚔ Adversarial Training (FGSM · PGD-50 · PGD-100)
+<details> <summary><b>点击展开 · 对抗流程公式</b></summary>
+x_adv^0 = x + small_noise
 
-* CI/CD via GitHub Actions
-* Dockerfile
-* AWS deployment
-* Load testing (Locust)
-* Agent memory (Redis)
+x_adv^{t+1} = Π_{Bε(x)} ( x_adv^t + α · sign(∇ₓ L(fθ(x_adv^t), y)) )
 
 
+PGD-50 = 50 步
+PGD-100 = 深度梯度攀爬攻击
+ε-ball projection = 将扰动投影回 L∞ ball
 
+支持：
+
+FGSM（1-step）
+
+PGD-20
+
+PGD-50
+
+PGD-100
+
+Random Start
+
+Gradient Climbing
+
+</details>
+📈 Loss Surface Visualization
+
+用来分析模型几何形态（sharp basin vs smooth basin）
+
+<details> <summary><b>点击展开 · 可视化示例（LossSurfaceExplorer）</b></summary>
+from utils.loss_surface_adapter import LossSurfaceExplorer
+
+explorer = LossSurfaceExplorer(C, loss_fn)
+explorer.plot_2d_surface(batch, radius=0.5, grid_size=25)
+
+</details>
+🔒 LEGAL NOTICE & DMCA COMPLIANCE
+<details open> <summary><b>点击展开 · Legal Notice / DMCA Protection</b></summary>
+
+本仓库内容受以下法律保护：
+
+📜 U.S. Copyright Law (Title 17)
+
+Unauthorized copying or distribution is prohibited
+
+DMCA Takedown procedure applies (17 U.S. Code §512)
+
+📜 U.S. Computer Fraud and Abuse Act (18 U.S.C. §1030)
+
+Unauthorized access to protected computer resources is not permitted
+
+This repository implements automated forensic logging to ensure compliance
+
+📜 Forensic Logging (安全性公告)
+
+为保护知识产权，本项目启用：
+
+访问指纹记录
+
+前端 User-Agent 标识
+
+代码变更审计 (Git Audit Trail)
+
+内容衍生比对 (Derivative Hash Comparison)
+
+这些机制用于 保护作者权益，并确保遵循平台与法律政策。
+
+</details>
+👑 Author
+<p align="center"> <img src="assets/LORDYINAN.jpg" width="360" style="border-radius: 18px; box-shadow: 0 0 12px rgba(255,0,128,0.45);" /> </p> <p align="center"><b>LORD YINAN — Architect of the FDE Universe</b></p>
