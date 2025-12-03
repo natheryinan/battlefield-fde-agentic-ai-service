@@ -1,4 +1,44 @@
+⚠️ Legal Notice（法律声明 / 强制警告）
 
+This repository and all associated source files, architectures, loss functions, training procedures, and documentation are protected under U.S. Copyright Law (17 U.S.C. §101 et seq.) and international copyright treaties.
+
+Any unauthorized:
+
+copying
+
+redistribution
+
+modification
+
+commercial use
+
+AI model training based on this work
+
+or incorporation into proprietary systems
+
+is a direct violation of federal law and will result in civil liability, statutory damages, and legal action.
+
+Maximum statutory damages:
+
+Up to $150,000 per infringement (17 U.S.C. §504(c)(2))
+
+Plus attorney fees and injunctive relief
+
+Plus DMCA takedown & permanent ban from GitHub
+
+All access to this repository is monitored and logged, including:
+
+IP address
+
+API token
+
+GitHub account UUID
+
+Geo-location metadata
+
+If you attempt to steal or replicate this code, you are fully consenting to legal jurisdiction in the United States.
+
+You have been warned.
 
 # 🚀 **Battlefield FDE – Agentic AI + FastAPI Production Microservice**
 
