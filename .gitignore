@@ -1,0 +1,37 @@
+
+# --- Python 基础 ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+
+# --- 虚拟环境 ---
+.venv/
+venv/
+.env/
+.env.*/
+*.env
+
+# --- 编辑器 / 系统文件 ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- 构建产物 ---
+build/
+dist/
+*.egg-info/
+*.log
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+notebooks/.ipynb_checkpoints/
+
+# --- 数据 / 模型 （按需补充）---
+data/
+outputs/
+checkpoints/
+*.pt
+*.pth
