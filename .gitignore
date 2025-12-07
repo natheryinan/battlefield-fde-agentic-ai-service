@@ -1,37 +1,42 @@
-
-# --- Python 基础 ---
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.pkl
-
-# --- 虚拟环境 ---
-.venv/
-venv/
-.env/
-.env.*/
+# ===== ENV / SECRETS =====
+.env
 *.env
+*.local
+*.secret
 
-# --- 编辑器 / 系统文件 ---
+# ===== PRIVATE MEDIA (REAL PHOTOS / RAW IMAGES) =====
+real_photos/
+private_images/
+private_media/
+*.png
+*.jpg
+!assets/LORDYINAN.jpg
+
+# ===== PYTHON CACHE =====
+__pycache__/
+*.pyc
+*.pyo
+
+# ===== IDE FILES =====
 .vscode/
 .idea/
-.DS_Store
-Thumbs.db
+*.iml
 
-# --- 构建产物 ---
-build/
-dist/
-*.egg-info/
+# ===== LOGS =====
+logs/
 *.log
 
-# --- Jupyter ---
-.ipynb_checkpoints/
-notebooks/.ipynb_checkpoints/
+# ===== NOTEBOOK CHECKPOINTS =====
+*.ipynb_checkpoints
+*.checkpoint
 
-# --- 数据 / 模型 （按需补充）---
-data/
-outputs/
-checkpoints/
+# ===== MODEL WEIGHTS =====
 *.pt
+*.h5
+*.ckpt
 *.pth
+
+# ===== TEMP FOLDERS =====
+tmp/
+temp/
+cache/
