@@ -1,0 +1,46 @@
+# ===== ENV / SECRETS =====
+.env
+*.env
+*.local
+*.secret
+
+# ===== PRIVATE MEDIA (REAL PHOTOS / RAW IMAGES) =====
+real_photos/
+private_images/
+private_media/
+
+# ===== PYTHON / VENV =====
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ===== NODE =====
+node_modules/
+dist/
+build/
+
+# ===== LOGS =====
+logs/
+*.log
+
+# ===== NOTEBOOK CHECKPOINTS =====
+.ipynb_checkpoints/
+
+# ===== MODEL WEIGHTS =====
+*.pt
+*.h5
+*.ckpt
+*.pth
+
+# ===== TEMP =====
+tmp/
+temp/
+cache/
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.iml
