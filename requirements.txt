@@ -1,0 +1,17 @@
+# --- FastAPI Serverless Tiny Universe ---
+fastapi==0.112.0
+pydantic==2.9.2
+pydantic-core==2.23.4
+mangum==0.17.0
+uvicorn==0.30.3
+
+# --- Tiny Universe Engine Dependencies ---
+numpy==1.26.4
+pandas==2.2.2
+
+# 如果 cosmic engine 用到了 logging / serialization，你可以保留：
+orjson==3.10.7
+python-dotenv==1.0.1
+
+# 如果你 toy persona / toy router 用 sklearn，请加：
+# scikit-learn==1.4.2
