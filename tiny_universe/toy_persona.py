@@ -1,91 +1,43 @@
-
-
-from __future__ import annotations
-
-from typing import Any
-import numpy as np
 import pandas as pd
+from typing import Dict, Any
 
 
-class ToyAlphaPersona:
-    
-    name = "Toy-Alpha"
+class ToyPersona:
+    """
+    极简 Persona：
+    - 输入 snapshot / portfolio / ctx / factors
+    - 输出一个 1D signal Series
+    """
 
-    def __init__(self, lookback: int = 60) -> None:
-        
-        self.lookback = int(lookback)
+    def __init__(self, name: str = "toy-alpha") -> None:
+        self.name = name
 
-    def compute_signals(
+    def step(
         self,
-        snapshot: Any,
-        portfolio: Any,
-        ctx: Any,
-        **kwargs: Any,
+        snapshot: Dict[str, Any],
+        portfolio: Dict[str, Any],
+        ctx: Dict[str, Any],
+        factors: Dict[str, Any] | None = None,
     ) -> pd.Series:
-      
-        prices = snapshot.prices.astype(float)
+        """
+        这里我们搞一个最简单的逻辑：
+        - snapshot["prices"] 是一个 {ticker: price} 的 dict
+        - signal = (price - mean) / std  得到一个 z-score
+        """
+        prices_dict = snapshot.get("prices", {})
+        if not prices_dict:
+            # 没有数据就给一个空的 Series
+            return pd.Series(dtype=float)
 
-        mean = prices.mean()
-        std = prices.std(ddof=0) or 1.0
-        z = (prices - mean) / std
+        prices = pd.Series(prices_dict, dtype=float)
 
-        return z.clip(-3, 3)
-
-
-class ToyConvexityPersona:
-   
-    name = "Toy-Convexity"
-
-    def compute_signals(
-        self,
-        snapshot: Any,
-        portfolio: Any,
-        ctx: Any,
-        **kwargs: Any,
-    ) -> pd.Series:
-        prices = snapshot.prices.astype(float)
-
-        
-        rel = prices / prices.mean() - 1.0
-        conv = rel ** 2
-
-        if conv.std(ddof=0) == 0:
-            return conv * 0.0
-
-        conv = (conv - conv.mean()) / conv.std(ddof=0)
-        return conv.clip(-3, 3)
-
-
-class ToyGuardianPersona:
-    
-    name = "Toy-Guardian"
-
-    def compute_signals(
-        self,
-        snapshot: Any,
-        portfolio: Any,
-        ctx: Any,
-        **kwargs: Any,
-    ) -> pd.Series:
-        prices = snapshot.prices.astype(float)
-
-        
-        if getattr(portfolio, "positions", None) is None:
-            pos = pd.Series(0.0, index=prices.index)
+        if prices.std() == 0:
+            # 全部相等就给 0
+            z = prices * 0.0
         else:
-            pos = portfolio.positions.reindex(prices.index).fillna(0.0).astype(float)
+            z = (prices - prices.mean()) / prices.std()
 
-        risk_score = -pos.abs()
+        # 让 signal 更温和一点
+        signal = z.clip(-2, 2) / 2.0
 
-        if risk_score.std(ddof=0) == 0:
-            return risk_score * 0.0
-
-        risk_score = (risk_score - risk_score.mean()) / risk_score.std(ddof=0)
-        return risk_score.clip(-3, 3)
-
-
-__all__ = [
-    "ToyAlphaPersona",
-    "ToyConvexityPersona",
-    "ToyGuardianPersona",
-]
+        return signal
