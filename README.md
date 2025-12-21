@@ -60,6 +60,14 @@ This framework is designed for:
 
 ---
 
+
+## 🎯 Intent & Scope
+
+This repository functions as a **research and capability module** within a broader system architecture, focusing on modeling logic, adversarial dynamics, and decision structures rather than end-user execution or turnkey deployment.
+
+
+---
+
 # 🧠 System Overview
 
 ## 🔷 Generator (U-Net Backbone)
