@@ -44,3 +44,12 @@ cache/
 .vscode/
 .idea/
 *.iml
+
+__pycache__/
+*.pyc
+
+
+
+__pycache__/
+*.pyc
+*.zip

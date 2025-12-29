@@ -8,20 +8,7 @@ from fde.interfaces.core import MarketSnapshot, PortfolioState, PersonaContext
 
 
 class FDEEngine:
-    """
-    FDEEngine
-    -----------------------------------------
-
-    宇宙战神引擎（Earth-projected version）：
-
-        - 调 Alpha（横截面吊打）
-        - 调 Convexity（Universe Gamma Field）
-        - 调 Guardian（风险守门）
-        - 汇总所有人格 signal → 交给 Router 组合融合
-
-    最终输出：
-        一条给人类 / 小动物执行的 1D 近视版信号 Series。
-    """
+    
 
     def __init__(self, personas: Dict[str, Any], router: Any) -> None:
         self.personas = personas

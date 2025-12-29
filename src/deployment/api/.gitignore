@@ -1,0 +1,21 @@
+
+# Python venv
+.venv/
+venv/
+
+# Bytecode
+__pycache__/
+*.py[cod]
+
+# VSCode
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Zip / artifacts
+*.zip

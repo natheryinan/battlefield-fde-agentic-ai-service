@@ -1,0 +1,39 @@
+service: tiny-universe-api
+
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: us-east-1
+  stage: dev
+  timeout: 29
+  memorySize: 512
+  environment:
+    STAGE: ${sls:stage}
+
+functions:
+  api:
+    handler: cosmic/serverless/handler.handler
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: ANY
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!venv/**'
+    - '!__pycache__/**'
+    - 'cosmic/**'
+    - 'tiny_universe/**'
+    - 'requirements.txt'
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+    slim: true
+    strip: false

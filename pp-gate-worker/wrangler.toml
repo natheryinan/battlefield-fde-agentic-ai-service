@@ -1,0 +1,6 @@
+
+name = "pp-gate"
+main = "src/worker.js"
+compatibility_date = "2025-12-16"
+
+kv_namespaces = [{ binding = "GATES", id = "39f7f26fcc824436be2185057ce6a8a3" }]

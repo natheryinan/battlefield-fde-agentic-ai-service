@@ -1,0 +1,16 @@
+{
+  "owner": "Yinan",
+  "audience": "Huawei-only",
+  "purpose": "External technical topology reference",
+  "visibility": "non-indexed",
+  "created_utc": "2025-12-16T19:00:00Z",
+  "ttl_hours": 22,
+  "notes": "Non-navigable. Expires automatically.",
+  "access_policy": {
+    "once_view": true,
+    "no_index": true,
+    "no_archive": true
+  },
+
+  "notes": 
+}
