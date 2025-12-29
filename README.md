@@ -1,69 +1,106 @@
-<p align="center">
-  <img src="assets/LORDYINAN.jpg" width="260" style="border-radius: 16px; box-shadow: 0 0 18px rgba(255,0,128,0.35);" />
-</p>
+# FDE — Financial Decision Engine (Agentic AI Architecture)
 
-<h1 align="center">🔥 battlefield-fde-agentic-ai-service 🔥</h1>
-<h3 align="center">Adversarial Defense · Agentic AI · Gradient Equilibrium Framework</h3>
+A modular, research-grade **multi-agent financial decision system** integrating
+reinforcement learning, risk-aware signal routing, adversarial robustness,
+and human-interpretable decision scaffolding.
 
-<p align="center"><b>Robustness · Equilibrium · Agentic Intelligence · Battlefield-Grade FDE Simulation</b></p>
-
----
-
-# ⚠️ Legal Notice
-
-All source code, architectures, training procedures, and documentation in this repository are protected under  
-**U.S. Copyright Law (17 U.S.C. §101 et seq.)** and international copyright treaties.
-
-Any unauthorized:
-
-- copying  
-- redistribution  
-- modification  
-- commercial use  
-- AI model training using this work  
-- incorporation into proprietary systems  
-
-is a direct violation of federal law and will result in:
-
-- Up to **$150,000 per infringement** (17 U.S.C. §504(c)(2))  
-- Attorney fees  
-- Court-ordered injunction  
-- DMCA takedown and permanent GitHub account removal  
-
-All access to this repository is logged, including IP address, User-Agent, GitHub UUID, and geolocation metadata.  
-Accessing this repo constitutes acceptance of U.S. legal jurisdiction.
+This monorepo serves as both an **engineering playground** and a **systems architecture prototype**
+for enterprise-scale AI decision automation across trading, pricing, risk, and strategic planning domains.
 
 ---
 
-# 🌐 Introduction
+## 🎯 Objectives
 
-`battlefield-fde-agentic-ai-service` is a **battlefield-grade adversarial robustness and model stability framework**, designed for environments with extreme noise, perturbation, adversarial pressure, and high-intensity gradient distortions.
-
-This system is not a toy adversarial sandbox —  
-it is a **structural stress-testing engine** for AI models.
-
-Core components:
-
-- **U-Net Generator** — structural restoration under noise  
-- **PatchGAN Discriminator** — authenticity scoring under adversarial uncertainty  
-- **FDE Classifier (Feature Deviation Engine)** — stabilizes logits, resists collapse  
-- **FGSM / PGD-100 / Gradient-Climbing Attacks** — multi-tier adversarial pressure  
-- **Loss Surface Explorer** — understanding geometric vulnerabilities and curvature behavior  
-
-This framework is designed for:
-
-- adversarial research  
-- model reliability under extreme conditions  
-- safety testing  
-- agentic intelligence structural analysis  
-- robustness benchmarking  
+- Model complex decision environments using **multi-agent RL personas**
+- Explore **risk–reward tradeoffs** under uncertainty and adversarial noise
+- Prototype **route-based execution engines** for dynamic signal allocation
+- Build an architecture that is:
+  - composable
+  - introspectable
+  - simulation-first
+  - production-adaptable
 
 ---
 
-# 🧠 System Overview
+## 🧠 Core Concepts
 
-## 🔷 Generator (U-Net Backbone)
-- Multi-scale feature recovery  
-- Residual reconstruction  
-- Robust structural restoration  
+### 🧩 Agent Personas
+The system organizes logic into cooperative / adversarial personas such as:
+
+- **Alpha** — opportunity seeking, signal extraction  
+- **Convexity** — asymmetric payoff hunting  
+- **Guardian** — downside control & safety margins  
+- **Liquidity** — execution & capital flow stability  
+- **Router** — allocates authority across personas  
+
+Each persona reasons independently and contributes to a **shared decision surface**.
+
+---
+
+## 🛠️ Repository Structure
+
+architecture/ — system diagrams, patterns, conceptual scaffolding
+engine/ — core execution + routing logic
+kernel/ — foundational primitives & shared utilities
+personas/ — agent persona modules and behavior definitions
+notebooks/ — research, simulations, exploratory modeling
+infra/ — deployment & environment scaffolding
+pp-gate-worker/ — Cloudflare worker experiments (gating / telemetry)
+tiny_universe/ — lightweight simulation sandboxes
+assets/ — diagrams, artifacts, visual models
+docs/ — design notes and long-form architecture writing
+
+
+
+---
+
+## 🧪 Experiments & Simulation Focus
+
+This project emphasizes **sandbox-first development**:
+
+- scenario replay & counterfactual testing  
+- robustness under perturbation and noise  
+- explainable routing decisions  
+- persona-level outcome attribution  
+
+The goal is understanding **how** the system reasons — not just whether it performs.
+
+---
+
+## 🚧 Status
+
+> ⚠️ Work-in-progress, evolving architecture.  
+> Modules may be experimental, speculative, or intentionally exploratory.
+
+This repo is intended for **research, iteration, and conceptual validation** —
+not a drop-in production trading system.
+
+---
+
+## 🌌 Philosophy
+
+FDE is built on the belief that **financial and strategic decision systems** should be:
+
+- transparent instead of opaque  
+- multi-perspective instead of monolithic  
+- resilient instead of brittle  
+- human-interpretable instead of black-box  
+
+This project explores what that future could look like.
+
+---
+
+## 👤 Author
+
+**Yinan Yang**  
+Architect & Builder — Agentic AI Systems, Decision Intelligence, and RL-Driven Simulation
+
+- Portfolio & research interests: multi-agent architectures, risk-aware routing,
+  adversarial robustness, and interpretable decision pipelines.
+- This project reflects an ongoing exploration of **how complex financial reasoning
+  can be structured, modularized, and made auditable**.
+
+If you are evaluating this work for collaboration, research alignment,
+or advanced architecture roles, feel free to connect.
+
 
