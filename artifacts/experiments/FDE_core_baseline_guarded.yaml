@@ -1,0 +1,168 @@
+
+# FDE_core_baseline_guarded.yaml
+# Baseline FDE run with hardened regime risk router and crash-prevention line
+# Core • Guarded • Sovereign
+
+meta:
+  id: "FDE_core_baseline_guarded"
+  description: "Core FDE baseline run with guarded risk architecture and hardened regime persona."
+  created_at: "2025-12-30"
+  author: "Yinan Sovereign Architecture"
+  version: "1.0.0"
+
+seed:
+  global: 155
+
+data:
+  universe:
+    name: "equity_largecap_us"
+    symbols:
+      - "SPY"
+      - "QQQ"
+      - "IWM"
+      - "INDEX_500"   # ← added benchmark index (map to SPX / GSPC in loader)
+  source:
+    type: "parquet"
+    root_path: "artifacts/data/equity_largecap_us"
+    price_fields: ["open", "high", "low", "close"]
+    volume_field: "volume"
+  calendar:
+    frequency: "1d"
+    trading_days_only: true
+  splits:
+    train:
+      start: "2015-01-01"
+      end:   "2021-12-31"
+    validation:
+      start: "2022-01-01"
+      end:   "2023-12-31"
+    test:
+      start: "2024-01-01"
+      end:   "2025-12-30"
+
+engine:
+  initial_equity: 1_000_000.0
+  base_currency: "USD"
+  fee_bps: 1.0
+  slippage_bps: 1.0
+  max_gross_leverage: 2.0
+  max_single_name_weight: 0.1
+
+personas:
+  enabled:
+    - "alpha"
+    - "convexity"
+    - "regime"
+    - "liquidity"
+    - "drawdown"
+
+  regime:
+    class_path: "engine.personas.regime.RegimePersona"
+    init:
+      max_risk: 1.0
+      trend_boost: 0.5
+      stress_cut: 0.5
+      crash_cut: 0.0
+      dd_stress_level: 0.08
+      dd_crash_level: 0.15
+      max_param_abs: 5.0
+
+  alpha:
+    class_path: "engine.personas.alpha.AlphaPersona"
+    init:
+      neutralize_beta: true
+      target_turnover_per_year: 6.0
+
+  convexity:
+    class_path: "engine.personas.convexity.ConvexityPersona"
+    init:
+      enable_tail_hedge: true
+      max_hedge_cost_bps_per_year: 150.0
+
+  liquidity:
+    class_path: "engine.personas.liquidity.LiquidityPersona"
+    init:
+      min_adv_ratio: 0.02
+      max_adv_ratio: 0.15
+
+  drawdown:
+    class_path: "engine.personas.drawdown.DrawdownPersona"
+    init:
+      soft_dd_limit: 0.10
+      hard_dd_limit: 0.20
+
+routing:
+  risk_router:
+    use_regime_persona: true
+    regime_weight: 0.7
+    local_signal_weight: 0.3
+    feature_mapping:
+      volatility: "features.vol_20d"
+      trend_strength: "features.trend_50d_strength"
+      trend_direction: "features.trend_50d_direction"
+      liquidity_score: "features.adv_normalized"
+      spread_stress: "features.bid_ask_stress"
+      drawdown_pct: "portfolio.current_drawdown_pct"
+      gap_risk: "features.gap_risk_5d"
+      volume_pressure: "features.volume_pressure"
+
+  crash_line:
+    halt_on_engine_halt: true
+    halt_on_regime:
+      - "crash_defcon"
+    cooldown_steps: 10
+
+positioning:
+  base_position_notional: 50_000.0
+  min_trade_notional: 5_000.0
+  rebalance_frequency: "1d"
+  sizing:
+    use_regime_multiplier: true
+    cap_per_symbol_weight: 0.10
+    cap_portfolio_gross_leverage: 2.0
+
+evaluation:
+  metrics:
+    - "cagr"
+    - "sharpe"
+    - "max_drawdown"
+    - "calmar"
+    - "hit_ratio"
+    - "avg_win_loss_ratio"
+  horizons:
+    - "all"
+    - "train"
+    - "validation"
+    - "test"
+  regime_breakdown:
+    enabled: true
+    by:
+      - "CALM_ACCUMULATION"
+      - "TREND_UP"
+      - "TREND_DOWN"
+      - "VOLATILE_CHOP"
+      - "STRESS"
+      - "CRASH_DEFCON"
+
+logging:
+  level: "INFO"
+  write_decisions: true
+  write_path: "artifacts/logs/FDE_core_baseline_guarded/"
+  include_guard_info: true
+  include_regime_scores: true
+
+
+benchmark:
+  symbol: "INDEX_500"
+  role: "reference"        # not traded
+  use_in:
+    performance: true      # curve vs index
+    regime_context: true   # feed into macro signal features
+    risk_report: true      # drawdown + beta vs index
+
+
+artifacts:
+  output_root: "artifacts/runs/FDE_core_baseline_guarded"
+  save_equity_curve: true
+  save_regime_timeline: true
+  save_position_history: true

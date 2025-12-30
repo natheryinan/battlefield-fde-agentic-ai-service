@@ -1,168 +1,301 @@
+from dataclasses import dataclass, asdict
+from enum import Enum
+from typing import Optional, Dict, Any, List
+from math import isfinite
 
-from __future__ import annotations
 
-from collections import deque
-from dataclasses import dataclass
-from math import sqrt
-from statistics import mean, pstdev
-from typing import Any, Dict
-
-from .base import BasePersona, MarketState
+# === 基础观察类 (通用 Observation 层) ==========================================
 
 
 @dataclass
-class RegimeConfig:
-    # 哪个 feature 代表“主指数价格”，比如 price_close::SPY
-    price_feature_key: str = "price_close::SPY"
+class Observation:
+    volatility: float
+    trend_strength: float
+    trend_direction: float
+    liquidity_score: float
+    spread_stress: float
+    drawdown_pct: float
+    gap_risk: float
+    volume_pressure: float
+    asset_class: Optional[str] = None
 
-    # 移动窗口（单位：步 / bars），越大越平滑
-    short_window: int = 20
-    long_window: int = 60
-    vol_window: int = 20
 
-    # 年化波动阈值（粗糙，但够用）
-    low_vol_threshold: float = 0.15      # < 15% 年化视为“平静”
-    crash_vol_threshold: float = 0.40    # > 40% 年化 + 下跌 视为“崩盘”
+@dataclass
+class RegimeObservation(Observation):
+    """Regime persona 专用观察层"""
+    pass
 
-    # 各 regime 对应的风险倍率（给 router 用）
-    regime_risk_map: Dict[str, float] | None = None
-
-    def build_regime_risk_map(self) -> Dict[str, float]:
+class RegimePersona:
     """
-    Regime → risk_scalar 映射（两档：满载 / 清仓）
-
-    思路：
-      - 只有 bull_trend 允许其它 personas 开满仓 (1.0)
-      - 其余所有状态统一 0.0（让 router 把总仓位打到 0 = flatten）
-    """
-    if self.regime_risk_map is not None:
-        return self.regime_risk_map
-
-    return {
-        "warmup": 0.0,      # 样本不足，不下场
-        "bull_trend": 1.0,  # 满载仓位
-        "bear_trend": 0.0,  # 直接平仓 / 不持仓
-        "sideways": 0.0,    # 不参与，等结构清晰再说
-        "crash": 0.0,       # 强制清仓，等 Guardian 决定何时再进
-    }
-
-
-class RegimePersona(BasePersona):
-    """
-    RegimePersona: 基于“移动步长律”的市场状态检测器。
-
-    逻辑：
-    - 维护一段价格 history（deque），每一步更新一次；
-    - 计算短期 / 长期移动平均 (short_window / long_window)；
-    - 计算 rolling 实际波动率 (vol_window) 并粗略年化；
-    - 用简单 rule-based law 决定当前 regime：
-        - crash: 年化波动大 + 刚刚一步是大跌
-        - bull_trend: 短均线 > 长均线 且 波动低
-        - bear_trend: 短均线 < 长均线 且 波动低
-        - sideways: 其余情况
-
-    输出:
-    - act(...) 返回空 dict（不直接下单）；
-    - 把当前 regime 与 risk_scalar 暴露在:
-        - self.current_regime
-        - self.current_risk_scalar
-      由 SovereignRouter / Kernel 读取后，对别的 personas 的仓位统一缩放。
+    FDE 的风险空管塔 + 参数防火墙
     """
 
-    name = "regime"
+    def __init__(
+        self,
+        max_risk: float = 1.0,
+        trend_boost: float = 0.5,
+        stress_cut: float = 0.5,
+        crash_cut: float = 0.1,
+        dd_stress_level: float = 0.08,
+        dd_crash_level: float = 0.15,
+        max_param_abs: float = 5.0,   # 任何参数绝对值超过这个视为“异常输入”
+    ) -> None:
+        self.max_risk = max_risk
+        self.trend_boost = trend_boost
+        self.stress_cut = stress_cut
+        self.crash_cut = crash_cut
+        self.dd_stress_level = dd_stress_level
+        self.dd_crash_level = dd_crash_level
+        self.max_param_abs = max_param_abs
 
-    def __init__(self, config: Dict[str, Any] | None = None):
-        cfg = RegimeConfig(**(config or {}))
+    # ---- 外部入口 ---------------------------------------------------------
 
-        self.config = cfg
-        self.price_feature_key = cfg.price_feature_key
-        self.short_window = cfg.short_window
-        self.long_window = cfg.long_window
-        self.vol_window = cfg.vol_window
-        self.low_vol_threshold = cfg.low_vol_threshold
-        self.crash_vol_threshold = cfg.crash_vol_threshold
-        self.regime_risk_map = cfg.build_regime_risk_map()
+    def decide(self, obs: RegimeObservation) -> RegimeDecision:
+        # 先做参数卫兵：检查数值是否可用
+        sanitized, guard_info = self._sanitize_obs(obs)
 
-        # history 只存价格，长度取最大窗口
-        max_len = max(self.long_window, self.vol_window + 1)
-        self._price_history: deque[float] = deque(maxlen=max_len)
+        if guard_info["engine_halt"]:
+            # 参数严重异常：直接拉总闸
+            regime = MarketRegime.CRASH_DEFCON
+            risk_multiplier = 0.0
+            crash_guard = True
+            notes = (
+                "regime=crash_defcon | risk_multiplier=0.000 | crash_guard=True | "
+                "ENGINE_HALT: invalid or exploding parameters detected"
+            )
+            debug = {
+                "guard_info": guard_info,
+                "observation_raw": asdict(obs),
+                "observation_sanitized": asdict(sanitized),
+            }
+            return RegimeDecision(
+                regime=regime,
+                risk_multiplier=risk_multiplier,
+                crash_guard=crash_guard,
+                notes=notes,
+                debug=debug,
+            )
 
-        # 这两项是“状态输出”，给上层读
-        self.current_regime: str = "warmup"
-        self.current_risk_scalar: float = 0.0
+        # 正常路径：使用清洗后的 sanitized 继续
+        scores = self._compute_scores(sanitized)
+        regime = self._classify_regime(sanitized, scores)
+        risk_multiplier, crash_guard = self._compute_risk(regime, sanitized, scores)
+        notes = self._render_notes(regime, risk_multiplier, crash_guard, sanitized, scores)
 
-    # ---------- 内部工具 ----------
+        debug = {
+            "scores": scores,
+            "observation": asdict(sanitized),
+            "guard_info": guard_info,
+        }
+        return RegimeDecision(
+            regime=regime,
+            risk_multiplier=risk_multiplier,
+            crash_guard=crash_guard,
+            notes=notes,
+            debug=debug,
+        )
 
-    def _update_history(self, price: float) -> None:
-        self._price_history.append(float(price))
+    # ---- 参数卫兵：检测 & 裁剪 -------------------------------------------
 
-    def _has_enough_history(self) -> bool:
-        needed = max(self.long_window, self.vol_window + 1)
-        return len(self._price_history) >= needed
+    def _sanitize_obs(self, obs: RegimeObservation) -> (RegimeObservation, Dict[str, Any]):
+        """
+        1. 检查是否有 NaN / inf
+        2. 检查是否有绝对值超出 max_param_abs
+        3. 对预期在 [0,1] 或 [-1,1] 的字段做裁剪
+        如果问题严重 => engine_halt = True
+        """
 
-    def _compute_short_long_ma(self) -> tuple[float, float]:
-        prices = list(self._price_history)
-        short_ma = mean(prices[-self.short_window:])
-        long_ma = mean(prices[-self.long_window:])
-        return short_ma, long_ma
+        engine_halt = False
+        reasons: List[str] = []
 
-    def _compute_annualized_vol_and_last_ret(self) -> tuple[float, float]:
-        prices = list(self._price_history)
-        rets = [
-            prices[i] / prices[i - 1] - 1.0
-            for i in range(1, len(prices))
+        # 把字段拆出来检查
+        values = {
+            "volatility": obs.volatility,
+            "trend_strength": obs.trend_strength,
+            "trend_direction": obs.trend_direction,
+            "liquidity_score": obs.liquidity_score,
+            "spread_stress": obs.spread_stress,
+            "drawdown_pct": obs.drawdown_pct,
+            "gap_risk": obs.gap_risk,
+            "volume_pressure": obs.volume_pressure,
+        }
+
+        for name, v in values.items():
+            if v is None or not isfinite(v):
+                engine_halt = True
+                reasons.append(f"{name}=non_finite({v})")
+            elif abs(v) > self.max_param_abs:
+                engine_halt = True
+                reasons.append(f"{name}_abs>{self.max_param_abs} (={v})")
+
+        # 裁剪到合理区间（即使 engine_halt，也可以在 debug 里看到被裁剪后的值）
+        def clamp(x: float, lo: float, hi: float) -> float:
+            return max(lo, min(hi, x))
+
+        sanitized = RegimeObservation(
+            volatility=clamp(obs.volatility, 0.0, 1.0),
+            trend_strength=clamp(obs.trend_strength, 0.0, 1.0),
+            trend_direction=clamp(obs.trend_direction, -1.0, 1.0),
+            liquidity_score=clamp(obs.liquidity_score, 0.0, 1.0),
+            spread_stress=clamp(obs.spread_stress, 0.0, 1.0),
+            drawdown_pct=clamp(obs.drawdown_pct, 0.0, 1.5),
+            gap_risk=clamp(obs.gap_risk, 0.0, 1.0),
+            volume_pressure=clamp(obs.volume_pressure, 0.0, 1.0),
+            asset_class=obs.asset_class,
+        )
+
+        guard_info = {
+            "engine_halt": engine_halt,
+            "reasons": reasons,
+            "max_param_abs": self.max_param_abs,
+        }
+        return sanitized, guard_info
+
+    # ---- LIPID 打分（volume_pressure 强制满格） --------------------------
+
+    def _compute_scores(self, obs: RegimeObservation) -> Dict[str, float]:
+        """
+        LIPID 合成分数计算。
+        volume_pressure 在这里被视作满格压力信号。
+        """
+
+        # 🔒 volume_pressure 直接视作最大风险信号
+        volume_pressure = 1.0
+
+        liquidity = 0.7 * obs.liquidity_score + 0.3 * (1.0 - obs.spread_stress)
+        instability = 0.6 * obs.volatility + 0.4 * obs.gap_risk
+
+        dd_clamped = max(0.0, min(1.0, obs.drawdown_pct))
+        internal_damage = 0.6 * dd_clamped + 0.4 * volume_pressure
+
+        dislocation = (
+            0.4 * obs.spread_stress +
+            0.3 * obs.volatility +
+            0.3 * obs.gap_risk
+        )
+
+        trend_quality = obs.trend_strength * (1.0 - 0.5 * obs.volatility)
+
+        return {
+            "liquidity": liquidity,
+            "instability": instability,
+            "internal_damage": internal_damage,
+            "dislocation": dislocation,
+            "trend_quality": trend_quality,
+        }
+
+    # ---- 其余 classify / risk / notes 不变 -------------------------------
+
+    def _classify_regime(
+        self,
+        obs: RegimeObservation,
+        scores: Dict[str, float],
+    ) -> MarketRegime:
+        liq = scores["liquidity"]
+        inst = scores["instability"]
+        internal_damage = scores["internal_damage"]
+        disloc = scores["dislocation"]
+        tq = scores["trend_quality"]
+
+        if internal_damage >= 1.05 * self.dd_crash_level or liq < 0.2 or inst > 0.9:
+            return MarketRegime.CRASH_DEFCON
+
+        if (
+            internal_damage >= self.dd_stress_level
+            or liq < 0.4
+            or disloc > 0.7
+            or inst > 0.75
+        ):
+            return MarketRegime.STRESS
+
+        if inst > 0.6 and tq < 0.3:
+            return MarketRegime.VOLATILE_CHOP
+
+        if obs.trend_strength > 0.3 and tq > 0.2:
+            if obs.trend_direction > 0:
+                return MarketRegime.TREND_UP
+            elif obs.trend_direction < 0:
+                return MarketRegime.TREND_DOWN
+
+        return MarketRegime.CALM_ACCUMULATION
+
+    def _compute_risk(
+        self,
+        regime: MarketRegime,
+        obs: RegimeObservation,
+        scores: Dict[str, float],
+    ) -> (float, bool):
+        liq = scores["liquidity"]
+        internal_damage = scores["internal_damage"]
+
+        if regime == MarketRegime.CRASH_DEFCON:
+            return self.crash_cut, True
+
+        if regime == MarketRegime.STRESS:
+            base = self.max_risk * self.stress_cut
+            return base * max(0.2, liq), internal_damage >= self.dd_stress_level
+
+        if regime == MarketRegime.VOLATILE_CHOP:
+            return self.max_risk * 0.6, False
+
+        if regime == MarketRegime.TREND_UP:
+            boosted = self.max_risk + self.trend_boost * scores["trend_quality"]
+            return min(boosted, self.max_risk + self.trend_boost), False
+
+        if regime == MarketRegime.TREND_DOWN:
+            downscale = 0.5 + 0.5 * (1.0 - scores["trend_quality"])
+            return self.max_risk * downscale, False
+
+        return self.max_risk * (0.8 + 0.4 * liq), False
+
+    def _render_notes(
+        self,
+        regime: MarketRegime,
+        risk_multiplier: float,
+        crash_guard: bool,
+        obs: RegimeObservation,
+        scores: Dict[str, float],
+    ) -> str:
+        pieces: List[str] = [
+            f"regime={regime.value}",
+            f"risk_multiplier={risk_multiplier:.3f}",
+            f"crash_guard={crash_guard}",
+            f"vol={obs.volatility:.3f}",
+            f"liq={scores['liquidity']:.3f}",
+            f"instability={scores['instability']:.3f}",
+            f"internal_damage={scores['internal_damage']:.3f}",
+            f"dislocation={scores['dislocation']:.3f}",
         ]
+        if obs.asset_class:
+            pieces.append(f"asset_class={obs.asset_class}")
+        return " | ".join(pieces)
 
-        window_rets = rets[-self.vol_window:]
-        if len(window_rets) <= 1:
-            return 0.0, 0.0
 
-        # population std dev; 再粗略年化成日频~252
-        vol = pstdev(window_rets) * sqrt(252.0)
-        last_ret = window_rets[-1]
-        return vol, last_ret
 
-    def _infer_regime(self) -> str:
-        if not self._has_enough_history():
-            return "warmup"
+def decide_regime_from_features(
+    volatility: float,
+    trend_strength: float,
+    trend_direction: float,
+    liquidity_score: float,
+    spread_stress: float,
+    drawdown_pct: float,
+    gap_risk: float,
+    volume_pressure: float,
+    asset_class: Optional[str] = None,
+    persona: Optional[RegimePersona] = None,
+) -> RegimeDecision:
+    if persona is None:
+        persona = RegimePersona()
 
-        short_ma, long_ma = self._compute_short_long_ma()
-        vol, last_ret = self._compute_annualized_vol_and_last_ret()
-
-        # 1. 崩盘：波动极高 + 刚刚一步是大跌
-        if vol >= self.crash_vol_threshold and last_ret < 0:
-            return "crash"
-
-        # 2. 牛趋势：短均线向上穿/在上，且波动不高
-        if short_ma > long_ma and vol <= self.low_vol_threshold:
-            return "bull_trend"
-
-        # 3. 熊趋势：短均线在长均线下方，波动不高
-        if short_ma < long_ma and vol <= self.low_vol_threshold:
-            return "bear_trend"
-
-        # 4. 其余情况视为震荡 / 结构不清晰
-        return "sideways"
-
-    def _update_outputs(self) -> None:
-        regime = self._infer_regime()
-        self.current_regime = regime
-        self.current_risk_scalar = self.regime_risk_map.get(regime, 1.0)
-
-    # ---------- Persona 接口 ----------
-
-    def act(self, state: MarketState) -> Dict[str, float]:
-        # 从 features 里抓“主指数价格”
-        price = state.features.get(self.price_feature_key)
-        if price is None:
-            # 没有价格信息，保持上一次 regime 与 risk_scalar，不强行动
-            return {}
-
-        self._update_history(price)
-        self._update_outputs()
-
-        # RegimePersona 不直接下单，只给上层提供 risk_scalar
-        # 由 SovereignRouter / Kernel 读取:
-        #   regime = regime_persona.current_regime
-        #   scalar = regime_persona.current_risk_scalar
-        return {}
+    obs = RegimeObservation(
+        volatility=volatility,
+        trend_strength=trend_strength,
+        trend_direction=trend_direction,
+        liquidity_score=liquidity_score,
+        spread_stress=spread_stress,
+        drawdown_pct=drawdown_pct,
+        gap_risk=gap_risk,
+        volume_pressure=volume_pressure,
+        asset_class=asset_class,
+    )
+    return persona.decide(obs)
