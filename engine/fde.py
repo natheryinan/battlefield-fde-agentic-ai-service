@@ -1,25 +1,36 @@
+# engine/fde.py
+from typing import Dict, List
+from personas.base import BasePersona, MarketState
+from personas.alpha import AlphaPersona
+from personas.convexity import ConvexityPersona
+from personas.liquidity import LiquidityPersona
+from personas.guardian import GuardianPersona
+from personas.regime import RegimePersona
+from personas.macro import MacroPersona
+from personas.anomaly import AnomalyPersona
+from personas.benchmark import BenchmarkPersona
+from personas.compliance import CompliancePersona
 
-from typing import Dict, Any
-import random
+class FDEEngine:
+    def __init__(self, personas: List[BasePersona] | None = None):
+        self.personas = personas or [
+            AlphaPersona(),
+            ConvexityPersona(),
+            LiquidityPersona(),
+            GuardianPersona(),
+            RegimePersona(),
+            MacroPersona(),
+            AnomalyPersona(),
+            # benchmark / compliance usually configured with params
+        ]
 
-def tiny_chance_gate(state: Dict[str, Any], p_min: float = 0.01) -> float:
-    r = float(state["runway"].survival_index())
-    ψ = float(state["psych_load"])
-    τ = float(state["time_pressure"])
+    def step(self, state: MarketState) -> Dict[str, float]:
+        proposals: Dict[str, Dict[str, float]] = {}
+        for p in self.personas:
+            proposals[p.name] = p.act(state)
 
-    extreme = (r < 0.5) or (ψ > 0.8) or (τ < 0.2)
-    return p_min if extreme else 0.10
-
-class FDE:
-    def __init__(self, router):
-        self._router = router
-
-    def step(self, state: Dict[str, Any]) -> Dict[str, Any]:
-        p = tiny_chance_gate(state, p_min=float(state.get("tiny_p_min", 0.01)))
-        state["tiny_chance_p"] = p
-
-        
-        state["tiny_probe_ok"] = (random.random() < p)
-
-        action = self._router.route(state)
-        return {"action": action, "state": state}
+        aggregated: Dict[str, float] = {}
+        for action in proposals.values():
+            for symbol, delta in action.items():
+                aggregated[symbol] = aggregated.get(symbol, 0.0) + delta
+        return aggregated
