@@ -1,0 +1,21 @@
+
+# raw – 原始数据层 (Raw Layer)
+
+Purpose:
+- 存放 **最原始 / 最少加工** 的输入数据：
+  - 市场行情 (OHLCV, order book snapshots, trades)
+  - 宏观时间序列
+  - 指数成分、标的元数据等
+
+Rules:
+- 文件命名：`<domain>_<freq>_<start>-<end>.<ext>`
+  - 例：`market_ohlcv_1m_2025-01-01-2025-01-31.parquet`
+  - 例：`macro_rates_daily_2010-01-01-2025-01-01.parquet`
+- 只允许：
+  - 基础清洗（类型修正、去重、删除明显坏行）
+  - 不做特征工程、不做聚合重采样
+- 任何“含有模型假设”的数据，一律放到 `features/` 或 `reference/`。
+
+Downstream:
+- `features/` 作为特征工程输入
+- `backtests/` 可直接读取 raw 用于重现真实市场轨迹

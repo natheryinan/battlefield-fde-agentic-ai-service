@@ -1,0 +1,56 @@
+
+# Global Data Catalog – Temporary Metadata Structure Table
+# 用于管理数据资产血缘 / 版本 / 语义映射（过渡期结构化）
+
+datasets:
+
+  features_core_daily_v1:
+    layer: features
+    path: "artifacts/data/features/features_core_daily_2024.parquet"
+    source_raw:
+      - "artifacts/data/raw/market_ohlcv_1d_2024.parquet"
+    description: >
+      Core daily signal matrix for FDE routing & Alpha stack input.
+
+    schema:
+      required_fields: ["timestamp", "symbol"]
+      feature_prefix: "feature_"
+      signal_prefix: "signal_"
+
+    lineage:
+      generated_by: "notebooks/feature_engineering/core_signals.ipynb"
+      upstream_reference:
+        - "artifacts/data/reference/instruments_master.csv"
+        - "artifacts/data/reference/risk_bands_config.yaml"
+
+    version:
+      commit: null
+      created_at: null
+      owner: "research"
+      status: "staging"   # draft | staging | validated | prod
+
+  liquidity_intraday_signals_v1:
+    layer: features
+    path: "artifacts/data/features/signals_liquidity_intraday_2025-01.parquet"
+
+    source_raw:
+      - "artifacts/data/raw/market_trades_1m_2025-01.parquet"
+      - "artifacts/data/raw/orderbook_snapshots_2025-01.parquet"
+
+    description: >
+      Liquidity & microstructure signals for router protection & collapse safety.
+
+    schema:
+      required_fields: ["timestamp", "symbol"]
+      signal_prefix: "liq_"
+
+    lineage:
+      generated_by: "pipelines/build_liquidity_signals.py"
+      upstream_reference:
+        - "artifacts/data/reference/instruments_master.csv"
+
+    version:
+      commit: null
+      created_at: null
+      owner: "infra"
+      status: "draft"

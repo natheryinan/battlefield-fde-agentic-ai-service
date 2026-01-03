@@ -1,0 +1,19 @@
+
+experiment_config: "artifacts/experiments/FDE_core_guarded_v155.yaml"
+
+features_used:
+  - "artifacts/data/features/features_core_daily_2024.parquet"
+
+period:
+  start: "2024-01-01"
+  end: "2024-12-31"
+
+metrics:
+  sharpe: null
+  cagr: null
+  max_drawdown: null
+  volatility: null
+  turnover: null
+
+notes: >
+  Placeholder template. Populate during evaluation.

@@ -1,0 +1,29 @@
+# pipelines – FDE Data & Simulation Pipelines
+
+Purpose:
+- 将 `artifacts/data` 和 `architecture/model` 串成 **可执行流水线**：
+  1. raw → features
+  2. features → backtests
+  3. 元数据同步与校验
+
+Conventions:
+- 所有 pipeline 脚本应当：
+  - 只做 “编排” 工作，不在这里写复杂业务逻辑
+  - 尽量调用 engine / architecture / utils 中的函数
+  - 读写路径遵守 `artifacts/data/...` 目录结构
+
+Core scripts (first wave):
+- `raw_to_features_core.py`
+  - 从 `artifacts/data/raw` 读取行情 / 宏观数据
+  - 生成核心特征矩阵到 `artifacts/data/features`
+  - 可选同步更新 `data_catalog_metadata.yaml`
+
+- `features_to_backtest_fde_core.py`
+  - 加载 FDE Core wiring (`architecture/model/fde_core_wiring.py`)
+  - 使用 features + experiment yaml 运行回测
+  - 将结果写入 `artifacts/data/backtests`
+
+Later extensions:
+- 计划增加：
+  - 端到端日更 batch 脚本
+  - 在线测试 / 监控报表生成脚本
