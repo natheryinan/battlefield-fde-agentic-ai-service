@@ -1,7 +1,7 @@
 # 🛡 FDE Battlefield Sovereign Architecture™
 ### Alpha-Centric Risk-Aware Intelligence System
 
-**Sovereign Creator: Yinan Yang — Alpha Origin**
+**Sovereign Creator: YINAN YANG — ALPHA ORIGIN**
 
 ---
 
