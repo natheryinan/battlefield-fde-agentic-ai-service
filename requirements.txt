@@ -11,7 +11,7 @@ pandas==2.2.2
 
 # 如果 cosmic engine 用到了 logging / serialization，你可以保留：
 orjson==3.10.7
-python-dotenv==1.0.1
+python-dotenv==1.2.1
 
 # 如果你 toy persona / toy router 用 sklearn，请加：
 # scikit-learn==1.4.2
