@@ -1,106 +1,95 @@
-# FDE — Financial Decision Engine (Agentic AI Architecture)
-
-A modular, research-grade **multi-agent financial decision system** integrating
-reinforcement learning, risk-aware signal routing, adversarial robustness,
-and human-interpretable decision scaffolding.
-
-This monorepo serves as both an **engineering playground** and a **systems architecture prototype**
-for enterprise-scale AI decision automation across trading, pricing, risk, and strategic planning domains.
+# 🛡️ FDE Battlefield Sovereign Architecture™  
+### A Risk-Aware, Covenant-Governed, Multi-Persona Decision Engine  
+### 基于风险意识与契约治理的多人格决策引擎
 
 ---
 
-## 🎯 Objectives
+## 🎯 Vision & Purpose ｜系统使命
 
-- Model complex decision environments using **multi-agent RL personas**
-- Explore **risk–reward tradeoffs** under uncertainty and adversarial noise
-- Prototype **route-based execution engines** for dynamic signal allocation
-- Build an architecture that is:
-  - composable
-  - introspectable
-  - simulation-first
-  - production-adaptable
+现代智能系统大多追求性能与收益，而忽略：
+- 风险边界
+- 行为约束
+- 系统责任
+- 长期后果
 
----
+**FDE Battlefield Sovereign Architecture™ 的存在意义是：**
 
-## 🧠 Core Concepts
+> 在「智能行动」与「系统责任」之间  
+> 建立一套具有 **护卫、约束、互补、自省能力** 的决策结构。
 
-### 🧩 Agent Personas
-The system organizes logic into cooperative / adversarial personas such as:
-
-- **Alpha** — opportunity seeking, signal extraction  
-- **Convexity** — asymmetric payoff hunting  
-- **Guardian** — downside control & safety margins  
-- **Liquidity** — execution & capital flow stability  
-- **Router** — allocates authority across personas  
-
-Each persona reasons independently and contributes to a **shared decision surface**.
+This project is not just an engine — it is a **system paradigm** where:
+- 🧠 Personas collaborate instead of dominate  
+- 🛡️ Covenant governs actions and consequences  
+- ⚖️ Risk-awareness precedes optimization  
 
 ---
 
-## 🛠️ Repository Structure
+## 🧬 Core Structure ｜核心结构
 
-architecture/ — system diagrams, patterns, conceptual scaffolding
-engine/ — core execution + routing logic
-kernel/ — foundational primitives & shared utilities
-personas/ — agent persona modules and behavior definitions
-notebooks/ — research, simulations, exploratory modeling
-infra/ — deployment & environment scaffolding
-pp-gate-worker/ — Cloudflare worker experiments (gating / telemetry)
-tiny_universe/ — lightweight simulation sandboxes
-assets/ — diagrams, artifacts, visual models
-docs/ — design notes and long-form architecture writing
+| Layer 层级 | Role 职责 |
+|---------|--------|
+| **Alpha Persona** | 进攻型——机会捕获 / 增益导向 |
+| **Guardian Persona** | 守护型——监督系统完整性 |
+| **Liquidity Shield** | 规模与冲击缓冲 |
+| **Convexity Response** | 极端条件下的自动防御转向 |
+| **Covenant Layer 契约层** | 行为边界 / 伦理约束 / 时间与阈值限制 |
+| **Sovereign Router** | 人格之间的责任切换与统筹裁决 |
 
+> **No single persona may rule the system.**  
+> **任何人格无权垄断决策。**
 
-
----
-
-## 🧪 Experiments & Simulation Focus
-
-This project emphasizes **sandbox-first development**:
-
-- scenario replay & counterfactual testing  
-- robustness under perturbation and noise  
-- explainable routing decisions  
-- persona-level outcome attribution  
-
-The goal is understanding **how** the system reasons — not just whether it performs.
+所有行动 **必须先通过 Covenant（契约护城层）**。
 
 ---
 
-## 🚧 Status
+## 🌌 System Philosophy ｜系统哲学
 
-> ⚠️ Work-in-progress, evolving architecture.  
-> Modules may be experimental, speculative, or intentionally exploratory.
+> “Intelligence without boundaries becomes destruction.  
+> Intelligence with covenant becomes sovereignty.”  
+> **没有边界的智能会走向毁灭；  
+> 具有契约的智能才拥有主权。**
 
-This repo is intended for **research, iteration, and conceptual validation** —
-not a drop-in production trading system.
+Battlefield（战场）并非战争隐喻，而是：
+- 决策张力空间
+- 风险-收益博弈场
+- 人格责任协调结构
 
----
-
-## 🌌 Philosophy
-
-FDE is built on the belief that **financial and strategic decision systems** should be:
-
-- transparent instead of opaque  
-- multi-perspective instead of monolithic  
-- resilient instead of brittle  
-- human-interpretable instead of black-box  
-
-This project explores what that future could look like.
+系统不是武器，  
+而是一种 **责任化智能生命结构**。
 
 ---
 
-## 👤 Author
+## 🛡️ Concept & Naming Protection ｜概念与命名保护声明
 
-**Yinan Yang**  
-Architect & Builder — Agentic AI Systems, Decision Intelligence, and RL-Driven Simulation
+This project contains original:
+- 架构隐喻与语义体系  
+- 人格命名与治理模型  
+- 契约与主权框架  
+- Battlefield 叙事结构与符号语言  
 
-- Portfolio & research interests: multi-agent architectures, risk-aware routing,
-  adversarial robustness, and interpretable decision pipelines.
-- This project reflects an ongoing exploration of **how complex financial reasoning
-  can be structured, modularized, and made auditable**.
+它们属于 **原创思想与结构性表达**。
 
-If you are evaluating this work for collaboration, research alignment,
-or advanced architecture roles, feel free to connect.
+### ✅ Allowed ｜允许
+- 学术研究
+- 个人学习
+- 非商业理解与探索
 
+### ❌ Not Allowed Without Written Permission ｜未经许可禁止
+- 商业化移植或复刻
+- 在竞品系统中复制人格/契约语义框架
+- 概念重包装或衍生商业应用
 
+For licensing / collaboration｜如需授权：
+👉 Contact the author.
+
+---
+
+## 📖 Status
+
+This repository is a **Research Architecture & Portfolio Demonstration**  
+项目定位：**研究型架构 · 思想-工程融合原型**
+
+Commercial reuse requires written consent.  
+商业化再利用需取得书面许可。
+
+---
