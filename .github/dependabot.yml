@@ -1,14 +1,44 @@
 version: 2
+
 updates:
-  # Keep GitHub Actions up to date
+  # ===============================
+  # GitHub Actions (CI / workflows)
+  # ===============================
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "America/New_York"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore(ci)"
+    reviewers:
+      - "natheryinan"
 
-  # Keep Python dependencies up to date (requirements.txt / pip)
+  # ===============================
+  # Python dependencies (pip)
+  # ===============================
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+      time: "04:30"
+      timezone: "America/New_York"
     open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore(deps)"
+    reviewers:
+      - "natheryinan"
+    ignore:
+      # Avoid noisy pre-1.0 churn unless explicitly upgraded
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
