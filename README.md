@@ -55,3 +55,8 @@ C --- PSY
 C --- ENG
 ```
 
+Any experiment that bypasses canonicalization
+is considered invalid and non-existent.
+
+任何绕过 Canonicalization 的实验，
+在 FDE 体系中视为从未发生。
