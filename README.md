@@ -1,41 +1,52 @@
 # 🛡 FDE Battlefield Sovereign Architecture™
-### Alpha-Centric Risk-Aware Intelligence System
+### Alpha-Centric, Risk-Aware Decision Architecture
 
-**Sovereign Creator: YINAN YANG — ALPHA ORIGIN**
+**Sovereign Creator:** Yinan Yang  
+**Architecture Origin:** Alpha-Centric Sovereign Design
 
 ---
 
-> **FDE 是一套主权式跨领域存在结构（Sovereign Architecture），而不仅是金融或工程工具。**  
-> 本仓库中的实现、比喻、策略与系统示例，均属于其在不同领域中的 **投影场景（projection）**，而非本体本身。
+> A sovereign, alpha-centric decision architecture for adversarial,
+> high-uncertainty, and regime-unstable environments.
 
 
-## 🎯 Principle
 
-**Alpha is the permanent and final sovereign decision authority.**  
-All other personas operate as **auxiliary stability instruments**
-under Alpha-defined laws and boundaries.
+> **FDE is a sovereign, cross-domain decision architecture — not a single-purpose
+financial, engineering, or tactical tool.**
+>
+> The implementations, metaphors, strategies, and system examples contained in this
+repository represent **domain-specific projections** of the architecture,
+rather than the architecture’s canonical form itself.
 
-This system is designed for:
+---
 
-- adversarial environments
-- structural deception
-- volatility and regime instability
+## 🎯 Core Principle
 
-Its purpose is **endurance, survival, and disciplined sovereignty**.
+**Alpha is the permanent and final decision authority.**  
+All other personas function as **auxiliary stabilization and enforcement layers**
+operating strictly within Alpha-defined laws, constraints, and boundaries.
+
+This architecture is designed for environments characterized by:
+
+- adversarial pressure
+- structural uncertainty and deception
+- volatility, regime shifts, and constraint violations
+
+Its purpose is **long-horizon survivability, bounded adaptation, and sovereign control**.
 
 ```mermaid
 graph TD
 
-A[Alpha<br/>Final Authority & Irreversible Responsibility]
-B[Guardian Layer<br/>Boundary of Harm • Civilization of Risk]
-C[Covenant / Law / Constraint<br/>Non-Violation Doctrine]
+A[Alpha<br/>Final Authority & Irreversible Accountability]
+B[Guardian Layer<br/>Risk Containment • Boundary Enforcement]
+C[Covenant / Law / Constraints<br/>Non-Violation Doctrine]
 
 A --> B --> C
 
 subgraph Projections
 GOV[Governance Projection]
-WAR[Warfare Projection]
-PSY[Psychology Projection]
+WAR[Strategic / Conflict Projection]
+PSY[Psychological Projection]
 ENG[Engineering / Systems Projection]
 end
 
@@ -53,10 +64,3 @@ C --- GOV
 C --- WAR
 C --- PSY
 C --- ENG
-```
-
-Any experiment that bypasses canonicalization
-is considered invalid and non-existent.
-
-任何绕过 Canonicalization 的实验，
-在 FDE 体系中视为从未发生。

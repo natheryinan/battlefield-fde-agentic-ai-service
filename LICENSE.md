@@ -1,24 +1,34 @@
+# License — Restricted Proprietary Use
 
-# License — Restricted Proprietary Rights
-
-Copyright (c) 2025 Yinan Yang.  
+Copyright (c) 2025–2026 Yinan Yang.  
 All rights reserved.
 
-This repository is **NOT open-source** and **NOT licensed for public use**.
+This repository contains proprietary architecture, design patterns, terminology,
+and implementation authored by **Yinan Yang**.
 
-Unless you receive **explicit written permission** from the author:
+This project is **not open-source**.
 
-You MAY NOT:
-- Copy or redistribute this code or any portion
+## Permitted Use
+
+You are permitted to access, clone, and review this repository **solely for**:
+- Architectural evaluation
+- Technical review or discussion
+- Non-commercial, non-production assessment
+
+## Prohibited Use
+
+Unless you have received **explicit written permission** from the author, you may **not**:
+- Copy, redistribute, or sublicense this code or any portion of it
 - Modify, translate, or create derivative works
-- Use this code for commercial or research purposes
+- Use this code or its concepts in commercial products or services
 - Train, fine-tune, or distill machine learning models using this code
-- Deploy this code or any of its derivatives
-- Transfer this code to any third party
+- Deploy this code or any derivative in production environments
+- Transfer this repository or its contents to third parties
 
-By accessing this repository, you acknowledge:
-- You understand that this project is proprietary and protected by U.S. and international copyright law.
-- Unauthorized use may result in civil or criminal penalties.
+## Ownership and Protection
 
-For licensing inquiries, contact:  
+This project is protected by U.S. and international copyright law.
+All intellectual property rights are retained by the author.
+
+For licensing, collaboration, or authorization inquiries, please contact:  
 📧 **yangyinanapp@gmail.com**

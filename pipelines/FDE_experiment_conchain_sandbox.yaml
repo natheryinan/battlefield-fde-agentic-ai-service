@@ -1,0 +1,55 @@
+experiment:
+  id: FDE_experiment_onchain_sandbox_v0
+  description: >
+    Simulated on-chain decision environment with irreversibility
+    and executor-only liability. No rollback allowed.
+
+regime:
+  name: OnChainHighIrreversibility
+  properties:
+    irreversible: true
+    rollback_allowed: false
+    trust_sensitivity: high
+    execution_cost_model: variable
+    uncertainty_tolerance: low
+
+liability:
+  bearer: executor
+  transfer_allowed: false
+  socialization: false
+
+actors:
+  executor:
+    role: decision_initiator
+    risk_budget: limited
+  system:
+    role: FDE
+  guardian:
+    veto_power: high
+    pre_execution_only: true
+
+decision:
+  action_type: sign_transaction
+  estimated_cost: high
+  estimated_uncertainty: medium_high
+  expected_loss: high
+
+rules:
+  - name: guardian_preemptive_veto
+    condition:
+      irreversible: true
+      expected_loss: high
+    action: veto
+
+  - name: alpha_force_abort
+    condition:
+      irreversible: true
+      uncertainty: above_tolerance
+    action: abort
+
+output:
+  record:
+    - decision_allowed
+    - veto_triggered
+    - abort_triggered
+    - rationale
