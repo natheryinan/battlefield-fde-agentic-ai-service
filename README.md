@@ -55,6 +55,15 @@ C --- PSY
 C --- ENG
 ```
 
+## Intellectual Property & Ownership Notice
+
+This repository and all associated architecture, design patterns, terminology, and implementation
+are the original work of **Yinan Yang**.
+
+All rights reserved unless explicitly stated otherwise.
+Unauthorized use, reproduction, or derivative work is prohibited.
+
+
 Any experiment that bypasses canonicalization
 is considered invalid and non-existent.
 
