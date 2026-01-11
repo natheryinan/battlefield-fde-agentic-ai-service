@@ -7,16 +7,17 @@ from .base import PersonaOutput
 
 
 @dataclass
-class GuardianPersona:
-    actor_id: str = "GUARDIAN"
-    role: str = "ENFORCEMENT_ADVISOR"
+class AdvisorPersona:
+    actor_id: str = "ADVISOR"
+    role: str = "ADVISORY_ONLY"
 
     def think(self, context: Dict[str, Any]) -> PersonaOutput:
+        # Produce advice only. Never a commit.
         return PersonaOutput(
             actor_id=self.actor_id,
-            kind="ALERT",
+            kind="ADVICE",
             payload={
-                "risk_flags": context.get("risk_flags", []),
-                "note": "Guardrails warning. Non-binding; cannot commit.",
+                "note": "Suggestions based on signals. Non-binding.",
+                "context_digest": context.get("digest"),
             },
         )

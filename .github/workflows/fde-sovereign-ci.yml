@@ -1,0 +1,53 @@
+name: FDE Sovereign CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  sovereign-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 1️⃣ 主权身份检查
+      - name: Sovereign author check
+        run: |
+          echo "Commit author:"
+          git log -1 --pretty=format:'%an <%ae>'
+          if ! git log -1 --pretty=format:'%an' | grep -q "Yinan"; then
+            echo "⚠️ Non-sovereign commit detected"
+          fi
+
+      # 2️⃣ Covenant / Legal Hash
+      - name: Covenant integrity check
+        run: |
+          test -f docs/LEGAL_COVENANT.md || exit 1
+          sha256sum docs/LEGAL_COVENANT.md
+
+      # 3️⃣ Architecture boundary scan
+      - name: Forbidden export scan
+        run: |
+          ! grep -R "export .*AlphaLaw" . || (echo "❌ Forbidden export" && exit 1)
+
+      # 4️⃣ Engine sanity (NO full run)
+      - name: Engine smoke test
+        run: |
+          python - << 'EOF'
+          import sys
+          try:
+              import engine
+              print("Engine import OK")
+          except Exception as e:
+              print("Engine failed:", e)
+              sys.exit(1)
+          EOF
+
+      # 5️⃣ Audit trace
+      - name: Sovereign audit log
+        run: |
+          echo "CI run at $(date)" >> .ci_audit.log

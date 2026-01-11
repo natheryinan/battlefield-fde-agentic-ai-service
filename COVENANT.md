@@ -26,6 +26,46 @@ and are protected as conceptual architecture.
 
 ---
 
+┌──────────┐
+│ git push │
+└────┬─────┘
+     ▼
+┌──────────────────────────┐
+│ Sovereign CI Entry Gate  │  ← 主权入口
+│  - author check          │
+│  - branch law            │
+│  - covenant hash         │
+└────┬─────────────────────┘
+     ▼
+┌──────────────────────────┐
+│ Integrity & Covenant     │
+│  - license scan          │
+│  - architecture checksum │
+│  - forbidden export scan │
+└────┬─────────────────────┘
+     ▼
+┌──────────────────────────┐
+│ Engine Validation Layer  │
+│  - import graph sanity   │
+│  - persona boundaries    │
+│  - no-op misuse detection│
+└────┬─────────────────────┘
+     ▼
+┌──────────────────────────┐
+│ Controlled Test Run      │
+│  - smoke only            │
+│  - no real parameters    │
+│  - no full capability    │
+└────┬─────────────────────┘
+     ▼
+┌──────────────────────────┐
+│ Publish / Deny / Warn    │
+│  - badge update          │
+│  - audit log             │
+│  - optional webhook      │
+└──────────────────────────┘
+
+
 ## ✖ Prohibited Without Written Authorization
 
 - Commercial replication or derivative architecture adoption
