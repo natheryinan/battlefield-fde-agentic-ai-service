@@ -69,6 +69,11 @@ class SovereignRouter:
             excluded_personas=set(),
             degrade_mode=False,
             commentary="Initialized with base weights.",
+            # RuntimeState：运行期临时状态（ephemeral）
+            # 仅用于当前一次路由/计算过程
+            # 不具备决策权力，不可持久化，不构成 Alpha Commit
+            # 程序结束即失效
+
         )
 
     # ==============================================================
