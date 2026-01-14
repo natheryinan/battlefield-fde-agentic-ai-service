@@ -1,0 +1,21 @@
+[flake8]
+max-line-length = 120
+extend-ignore =
+    E221, E261,
+    E302, E303, E304, E305,
+    E402,
+    E501,
+    E741,
+    W291, W293, W391,
+    F401,
+    F841
+
+exclude =
+    .git,
+    __pycache__,
+    node_modules,
+    notebooks,
+    tiny_universe,
+    experiments,
+    online_access_logs_checks,
+    fde-core-private

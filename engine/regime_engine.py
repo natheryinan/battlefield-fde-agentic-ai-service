@@ -225,4 +225,5 @@ class RegimeEngine:
             return 2, "Fragile / Shock-Sensitive"
         return 3, "Critical — Crash Cascade Zone"
 
-    def _constraints_from_band(self, band:_
+    def _constraints_from_band(self, band):
+    raise NotImplementedError("_constraints_from_band not implemented yet")

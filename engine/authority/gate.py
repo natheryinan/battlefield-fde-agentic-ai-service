@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Mapping
 
 from .errors import AlphaRequired, SignatureRequired
 from .policy import AuthorityPolicy
 from .signature import AlphaSignature
+from engine.authority.decision_log import DecisionLog
+
+
 
 
 @dataclass(frozen=True)
 class CommitRequest:
-    action: str
+    
     actor_id: str
     payload: Dict[str, Any]
     signature: Optional[AlphaSignature] = None
@@ -18,25 +21,18 @@ class CommitRequest:
 
 class AuthorityGate:
     def __init__(self, policy: AuthorityPolicy, alpha_secret: str):
+        if not policy.alpha_actor_id:
+            raise ValueError("AuthorityPolicy.alpha_actor_id must be defined.")
+
+        if not policy.commit_actions:
+            raise ValueError("AuthorityPolicy.commit_actions must not be empty.")
+
+        if not alpha_secret:
+            raise ValueError("alpha_secret must be provided for Alpha verification.")
+
         self.policy = policy
         self.alpha_secret = alpha_secret
 
-    def require_alpha(self, req: CommitRequest) -> None:
-        if req.actor_id != self.policy.alpha_actor_id:
-            raise AlphaRequired(
-                f"Commit action '{req.action}' requires Alpha actor_id='{self.policy.alpha_actor_id}', got '{req.actor_id}'."
-            )
-
-    def require_signature(self, req: CommitRequest) -> None:
-        if req.signature is None:
-            raise SignatureRequired("Alpha signature is required for commit actions.")
-
-        if req.signature.actor_id != self.policy.alpha_actor_id:
-            raise SignatureRequired(f"Signature actor_id must be '{self.policy.alpha_actor_id}'.")
-
-        ok = AlphaSignature.verify(secret=self.alpha_secret, payload=req.payload, signature=req.signature)
-        if not ok:
-            raise SignatureRequired("Invalid Alpha signature.")
 
     def authorize(self, req: CommitRequest) -> None:
         """
@@ -45,4 +41,10 @@ class AuthorityGate:
         if req.action in self.policy.commit_actions:
             self.require_alpha(req)
             self.require_signature(req)
-        # Non-commit actions may pass (advisory outputs, observations, etc.)
+        def is_advisory_allowed(self, action: str) -> bool:
+        """
+        Non-commit actions must be explicitly allowed.
+        Default deny if unknown.
+        """
+        return action in getattr(self.policy, "advisory_actions", set())
+

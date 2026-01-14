@@ -1,0 +1,213 @@
+#!/bin/bash
+
+# ==============================================
+# GITHUB REPOSITORY SECURITY INVESTIGATION SCRIPT
+# ==============================================
+
+echo "=============================================="
+echo "  GITHUB REPOSITORY SECURITY AUDIT"
+echo "=============================================="
+echo ""
+
+# ========== STEP 1: NAVIGATE TO YOUR REPOSITORY ==========
+echo "[1/6] Navigating to your repository..."
+echo ""
+
+# CHANGE THIS PATH to your actual repository location
+REPO_PATH="$HOME/Documents/GitHub/battlefield-fde-agentic-ai-service"
+# OR if you're already in the repository, use:
+# REPO_PATH="$(pwd)"
+
+if [ -d "$REPO_PATH" ]; then
+    cd "$REPO_PATH" || exit
+    echo "✓ Successfully navigated to: $(pwd)"
+else
+    echo "✗ Repository not found at: $REPO_PATH"
+    echo "Please update REPO_PATH variable in the script"
+    exit 1
+fi
+
+echo ""
+
+# ========== STEP 2: CHECK GIT CONFIGURATION ==========
+echo "[2/6] Checking Git configuration and remote origin..."
+echo ""
+
+# Check remote URL (who has access to push)
+echo "=== Remote Origin (Who can push?) ==="
+git remote -v
+echo ""
+
+# Check Git configuration
+echo "=== Git User Configuration ==="
+git config --list | grep -E "user\.(name|email)|remote"
+echo ""
+
+# ========== STEP 3: DEEP ACCESS LOG ANALYSIS ==========
+echo "[3/6] Analyzing repository access logs..."
+echo ""
+
+# Get recent commits with full details
+echo "=== Last 50 Commits (Detailed) ==="
+git log --all --oneline --since="30 days ago" -50
+echo ""
+
+# Check commits by author
+echo "=== Commits by Author (Last 30 Days) ==="
+git shortlog -s -n --all --since="30 days ago"
+echo ""
+
+# Check for any force pushes or rebases
+echo "=== Reflog (History of all actions) ==="
+git log -g --oneline | head -30
+echo ""
+
+# Check for any unusual branches
+echo "=== All Branches ==="
+git branch -a
+echo ""
+
+# Check when branches were last updated
+echo "=== Branch Last Update Times ==="
+for branch in $(git branch -r | grep -v HEAD); do
+    echo -e "$(git show -s --format="%ci" $branch) $branch"
+done | sort -r
+echo ""
+
+# ========== STEP 4: FILE ACCESS ANALYSIS ==========
+echo "[4/6] Analyzing file changes and access patterns..."
+echo ""
+
+# Check which files have been modified recently
+echo "=== Recently Modified Files (Last 2 Weeks) ==="
+git log --name-only --since="14 days ago" --pretty=format:"" | sort | uniq -c | sort -rn | head -20
+echo ""
+
+# Check for large files that might have been added
+echo "=== Large Files in Repository (>1MB) ==="
+git rev-list --objects --all | \
+git cat-file --batch-check='%(objecttype) %(objectname) %(objectsize) %(rest)' | \
+awk '/^blob/ {if ($3 > 1048576) print $3/1048576 " MB" " " $4}' | sort -n
+echo ""
+
+# ========== STEP 5: SECURITY SCAN ==========
+echo "[5/6] Scanning for security issues..."
+echo ""
+
+# Check for any exposed credentials
+echo "=== Scanning for Potential Exposed Secrets ==="
+echo "Checking files for common patterns of secrets..."
+
+# Simple pattern matching for secrets (be careful with this output)
+echo "Scanning for API keys, tokens, passwords..."
+find . -type f \( -name "*.env*" -o -name "*.config*" -o -name "*.json" -o -name "*.yaml" -o -name "*.yml" -o -name "*.py" -o -name "*.js" -o -name "*.ts" \) \
+    -exec grep -l -E "(api[_-]?key|token|secret|password|passwd|pwd|auth)" {} \; 2>/dev/null | head -10
+
+echo ""
+echo "=== Checking for .gitignore effectiveness ==="
+# Check if sensitive files are committed
+if [ -f ".gitignore" ]; then
+    echo "✓ .gitignore file exists"
+    # Check if common sensitive files are ignored
+    for file in ".env" "node_modules/" ".DS_Store" "*.log"; do
+        if grep -q "$file" .gitignore; then
+            echo "  ✓ $file is in .gitignore"
+        else
+            echo "  ⚠ $file is NOT in .gitignore"
+        fi
+    done
+else
+    echo "✗ No .gitignore file found!"
+fi
+echo ""
+
+# ========== STEP 6: GITHUB SPECIFIC CHECKS ==========
+echo "[6/6] GitHub-specific security checks..."
+echo ""
+
+# Check if this is a GitHub repository
+if git remote -v | grep -q "github.com"; then
+    echo "=== GitHub Repository Detected ==="
+    
+    # Extract repo name from remote
+    REPO_URL=$(git remote get-url origin)
+    echo "Repository URL: $REPO_URL"
+    
+    # Extract owner and repo name
+    if [[ $REPO_URL =~ github.com[:/]([^/]+)/([^/.]+) ]]; then
+        OWNER=${BASH_REMATCH[1]}
+        REPO=${BASH_REMATCH[2]%.git}  # Remove .git suffix if present
+        
+        echo ""
+        echo "=== GitHub API Checks (Manual Steps) ==="
+        echo ""
+        echo "MANUAL STEPS TO PERFORM ON GITHUB.COM:"
+        echo "----------------------------------------"
+        echo "1. Go to: https://github.com/$OWNER/$REPO/settings/access"
+        echo "   Check 'Collaborators & teams'"
+        echo ""
+        echo "2. Go to: https://github.com/$OWNER/$REPO/settings/hooks"
+        echo "   Check 'Webhooks' for suspicious endpoints"
+        echo ""
+        echo "3. Go to: https://github.com/$OWNER/$REPO/settings/security_analysis"
+        echo "   Review 'Code security and analysis'"
+        echo ""
+        echo "4. Go to: https://github.com/$OWNER/$REPO/settings/installations"
+        echo "   Review 'GitHub Apps' with access"
+        echo ""
+        echo "5. Check traffic analytics:"
+        echo "   https://github.com/$OWNER/$REPO/graphs/traffic"
+        echo ""
+        echo "6. Check clone analytics:"
+        echo "   https://github.com/$OWNER/$REPO/graphs/clones"
+    fi
+else
+    echo "⚠ Not a GitHub repository or remote not set"
+fi
+
+echo ""
+echo "=============================================="
+echo "  INVESTIGATION COMPLETE"
+echo "=============================================="
+echo ""
+echo "SUMMARY OF FINDINGS:"
+echo "-------------------"
+echo "1. Review the commit logs above for unfamiliar authors"
+echo "2. Check if any branches you don't recognize exist"
+echo "3. Look for files modified at unusual times"
+echo "4. MANUALLY check GitHub.com for:"
+echo "   - Unknown collaborators"
+echo "   - Suspicious webhooks"
+echo "   - Third-party app access"
+echo ""
+
+# ========== BONUS: CREATE SECURITY REPORT ==========
+echo "Creating security report file..."
+{
+    echo "GitHub Security Audit Report"
+    echo "Generated on: $(date)"
+    echo "Repository: $(pwd)"
+    echo "=========================================="
+    echo ""
+    echo "Recent Commits:"
+    git log --all --oneline --since="30 days ago" -20
+    echo ""
+    echo "Recent Authors:"
+    git shortlog -s -n --all --since="30 days ago"
+    echo ""
+    echo "Current Branches:"
+    git branch -a
+} > "github_security_audit_$(date +%Y%m%d_%H%M%S).txt"
+
+echo "✓ Report saved as: github_security_audit_$(date +%Y%m%d_%H%M%S).txt"
+echo ""
+echo "=============================================="
+echo "  NEXT STEPS:"
+echo "=============================================="
+echo "1. Change GitHub password immediately"
+echo "2. Enable 2FA on GitHub"
+echo "3. Review authorized OAuth apps:"
+echo "   https://github.com/settings/applications"
+echo "4. Consider making repository private temporarily"
+echo "5. Add LICENSE file if missing"
+echo "6. Monitor for your code on other platforms"
