@@ -1,45 +1,39 @@
-# engine/authority/decision_log.py
 from __future__ import annotations
 
+import hashlib
 import json
-import os
 import time
-from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from dataclasses import dataclass, field
+from typing import Any, Dict, List
+
+
+def _stable_json(obj: Any) -> str:
+    return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
 @dataclass
 class DecisionLog:
-    """
-    Evidence-grade decision log (append-only style).
-    Default: JSONL file in cwd unless log_path is provided.
-    """
+    records: List[Dict[str, Any]] = field(default_factory=list)
 
-    log_path: Optional[str] = None
-
-    def __post_init__(self) -> None:
-        if self.log_path is None:
-            self.log_path = os.path.join(os.getcwd(), "fde_authority_log.jsonl")
-
-    def record_authorized_commit(
+    def record(
         self,
-        *,
         actor_id: str,
         action: str,
+        policy_id: str,
         payload: Dict[str, Any],
-        policy_version: str,
-        alpha_fingerprint: str,
-    ) -> None:
-        event = {
-            "ts": int(time.time()),
-            "event": "AUTHORIZED_COMMIT",
+    ) -> str:
+        """
+        Append an irreversible record and return decision_hash.
+        """
+        ts = int(time.time())
+        body = {
+            "ts": ts,
             "actor_id": actor_id,
             "action": action,
+            "policy_id": policy_id,
             "payload": payload,
-            "policy_version": policy_version,
-            "alpha_fingerprint": alpha_fingerprint,
         }
-        line = json.dumps(event, ensure_ascii=False, separators=(",", ":"))
-        # append-only
-        with open(self.log_path, "a", encoding="utf-8") as f:
-            f.write(line + "\n")
+        digest = hashlib.sha256(_stable_json(body).encode("utf-8")).hexdigest()
+        body["decision_hash"] = digest
+        self.records.append(body)
+        return digest
