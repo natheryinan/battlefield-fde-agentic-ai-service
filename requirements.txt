@@ -7,7 +7,7 @@ uvicorn==0.30.3
 
 # --- Tiny Universe Engine Dependencies ---
 numpy==1.26.4
-pandas==2.2.2
+pandas==2.3.3
 
 # 如果 cosmic engine 用到了 logging / serialization，你可以保留：
 orjson==3.10.7
