@@ -2,52 +2,88 @@ name: FDE Sovereign CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "main" ]
+
+permissions:
+  contents: read
 
 jobs:
   sovereign-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      # 1️⃣ 主权身份检查
+      # ✅ Ensure stable Python runtime
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Show Python info
+        run: |
+          python --version
+          which python
+
+      # 1️⃣ 主权身份检查 (fail on non-sovereign unless explicitly allowed)
       - name: Sovereign author check
+        env:
+          SOVEREIGN_NAME_FRAGMENT: "Yinan"
         run: |
           echo "Commit author:"
-          git log -1 --pretty=format:'%an <%ae>'
-          if ! git log -1 --pretty=format:'%an' | grep -q "Yinan"; then
-            echo "⚠️ Non-sovereign commit detected"
+          git log -1 --pretty=format:'%an <%ae>%n'
+          AUTHOR="$(git log -1 --pretty=format:'%an')"
+          if ! echo "$AUTHOR" | grep -qi "$SOVEREIGN_NAME_FRAGMENT"; then
+            echo "❌ Non-sovereign commit detected: $AUTHOR"
+            exit 1
           fi
 
-      # 2️⃣ Covenant / Legal Hash
+      # 2️⃣ Covenant / Legal Hash (fail if missing; print hash)
       - name: Covenant integrity check
         run: |
-          test -f docs/LEGAL_COVENANT.md || exit 1
+          test -f docs/LEGAL_COVENANT.md
+          echo "LEGAL_COVENANT.md sha256:"
           sha256sum docs/LEGAL_COVENANT.md
 
-      # 3️⃣ Architecture boundary scan
+      # 3️⃣ Architecture boundary scan (fail if forbidden export found)
       - name: Forbidden export scan
         run: |
-          ! grep -R "export .*AlphaLaw" . || (echo "❌ Forbidden export" && exit 1)
+          if grep -R --line-number --extended-regexp 'export[[:space:]].*AlphaLaw' .; then
+            echo "❌ Forbidden export detected"
+            exit 1
+          fi
+          echo "✅ No forbidden exports found"
 
-      # 4️⃣ Engine sanity (NO full run)
+      # 4️⃣ Engine sanity (NO full run) — make import path explicit
       - name: Engine smoke test
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
           python - << 'EOF'
           import sys
           try:
               import engine
-              print("Engine import OK")
+              print("✅ Engine import OK")
           except Exception as e:
-              print("Engine failed:", e)
+              print("❌ Engine failed:", e)
               sys.exit(1)
           EOF
 
-      # 5️⃣ Audit trace
+      # 5️⃣ Audit trace (persist as artifact)
       - name: Sovereign audit log
         run: |
-          echo "CI run at $(date)" >> .ci_audit.log
+          echo "CI run at $(date -u) UTC" | tee -a .ci_audit.log
+          echo "Ref: $GITHUB_REF" | tee -a .ci_audit.log
+          echo "SHA: $GITHUB_SHA" | tee -a .ci_audit.log
+
+      - name: Upload audit log
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-audit-log
+          path: .ci_audit.log
